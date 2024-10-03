@@ -1,15 +1,36 @@
-import { Injectable } from "@nestjs/common";
-// import { ConfigService } from "@nestjs/config";
+import { Injectable, OnModuleInit } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
-export class AppService {
-  // constructor(private configService: ConfigService) {}
+export class AppService implements OnModuleInit {
 
-  // getHello(): string {
-  //   const name = this.configService.get<string>("POTATO");
-  //   const howManyPotatoes = this.configService.get<number>("POTATO_COUNT");
-  //   console.log("name", name);
-  //   console.log("howManyPotatoes", howManyPotatoes);
-  //   return `Look at my ${howManyPotatoes} ${name}s`;
-  // }
+  constructor(private configService: ConfigService) {}
+
+  onModuleInit() {
+    this.tellMeAllYourSecrets();
+  }
+  
+  tellMeAllYourSecrets(): void {
+    console.log(`
+      ____________________________________________________________________________________________________
+
+      !!! WARNING: DO NOT PRINT YOUR SECRETS IN PRODUCTION! OI VAI VOI! THIS IS ONLY FOR DEMO PURPOSES !!! 
+      ____________________________________________________________________________________________________
+
+      BEHOLD MY SECRETS: 
+      
+      CONNECT TO DB!
+      port: ${this.configService.get<number>("DB_PORT")}
+      username: ${this.configService.get<string>("DB_USERNAME")}
+      password: ${this.configService.get<string>("DB_PASSWORD")}
+
+      AWS
+      apikey: ${this.configService.get<string>("AWS_API_KEY")}
+
+      ____________________________________________________________________________________________________
+
+      !!! WARNING: DO NOT PRINT YOUR SECRETS IN PRODUCTION! OI VAI VOI! THIS IS ONLY FOR DEMO PURPOSES !!! 
+      ____________________________________________________________________________________________________
+    `)
+  }
 }
