@@ -12,10 +12,12 @@ export class AppService implements OnModuleInit {
   }
   
   async tellMeAllYourSecrets(): Promise<void> {
-    const apiKey = await this.secretService.getSecret('AWS_API_KEY');
-    const DB_PORT = await this.secretService.getSecret('DB_PORT');
-    const DB_PASSWORD = await this.secretService.getSecret('DB_PASSWORD');
-    const DB_USERNAME = await this.secretService.getSecret('DB_USERNAME');
+    const [apiKey, DB_PORT, DB_PASSWORD, DB_USERNAME]  = await Promise.all([
+      this.secretService.getSecret('AWS_API_KEY'),
+      this.secretService.getSecret('DB_PORT'),
+      this.secretService.getSecret('DB_PASSWORD'),
+      this.secretService.getSecret('DB_USERNAME')]);
+
     console.log(`
       ____________________________________________________________________________________________________
 

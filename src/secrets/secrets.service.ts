@@ -12,21 +12,10 @@ export class SecretsService {
     private isDevEnv;
 
     constructor(private configService: ConfigService) {
-        const configuration: secretManagerConfiguration = {
+        this.isDevEnv = this.configService.get<string>("NODE_ENV") == "development";
+        this.client = new SecretsManagerClient({
             region: 'eu-north-1',
-        };
-
-        this.isDevEnv = this.configService.get<string>("NODE_ENV") == "development"
-        if (!this.isDevEnv) {
-            console.log("In prod env")
-
-            // configuration.credentials = {
-            //     accessKeyId: this.configService.get<string>("AWS_ACCESS_KEY_ID"),
-            //     secretAccessKey: this.configService.get<string>("AWS_SECRET_ACCESS_KEY"),
-            // }
-        }
-
-        this.client = new SecretsManagerClient(configuration);
+        });
     }
 
     async getSecret(secretName: string): Promise<string | null> {
@@ -47,7 +36,7 @@ export class SecretsService {
             const response = await this.client.send(command);
 
             if (response.SecretString) {
-                return response.SecretString;
+                return JSON.parse(response.SecretString)[secretName];
             }
             return null;
         } catch (error) {
