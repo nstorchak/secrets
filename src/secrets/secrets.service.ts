@@ -4,7 +4,6 @@ import {
     GetSecretValueCommand,
 } from '@aws-sdk/client-secrets-manager';
 import { ConfigService } from '@nestjs/config';
-import { secretManagerConfiguration } from 'src/types/types';
 
 @Injectable()
 export class SecretsService {
@@ -14,13 +13,13 @@ export class SecretsService {
     constructor(private configService: ConfigService) {
         this.isDevEnv = this.configService.get<string>("NODE_ENV") == "development";
         this.client = new SecretsManagerClient({
-            region: 'eu-north-1',
-        });
+            region: this.configService.get<string>("AWS_REGION"),
+        }); 
     }
 
     async getSecret(secretName: string): Promise<string | null> {
         if (this.isDevEnv) {
-            console.log("getting secret from ENV", secretName)
+            console.log("Getting secret from Environment Variables", secretName)
             return this.configService.get(secretName);
         }
         return this.getSecretFromAWS(secretName);
@@ -28,7 +27,7 @@ export class SecretsService {
 
     async getSecretFromAWS(secretName: string) {
         try {
-            console.log("getting secret from AWS", secretName)
+            console.log("Getting secret from AWS", secretName)
             const command = new GetSecretValueCommand({
                 SecretId: secretName,
                 VersionStage: 'AWSCURRENT',
@@ -40,7 +39,7 @@ export class SecretsService {
             }
             return null;
         } catch (error) {
-             console.log("Unable to fetch secret from AWS", error.message);
+            console.log("Unable to fetch secret from AWS", error.message);
             return null;
         }
     }
